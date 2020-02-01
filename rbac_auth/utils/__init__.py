@@ -9,3 +9,14 @@ email_re = re.compile(
     r')@(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?$', re.IGNORECASE)  # domain
 
 validate_email = EmailValidator(email_re, _(u'Enter a valid e-mail address.'), 'invalid')
+
+
+def is_sequence(arg):
+    '''
+    check if list or tuple
+    '''
+    return (
+        not hasattr(arg, 'strip') and (
+            hasattr(arg, '__getitem__') or hasattr(arg, '__iter__')
+        )
+    )

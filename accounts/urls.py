@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import (
 from .views import (
     TokenObtainPairView,
     TokenObtainSlidingView,
-    UserListCreateAPIView
+    UserListCreateAPIView,
+    UserRetrieveUpdateDestroyView
 )
 
 
@@ -19,4 +20,5 @@ urlpatterns = [
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
     path('users/', UserListCreateAPIView.as_view(), name='list_create_users'),
+    path('users/<str:pk>/', UserRetrieveUpdateDestroyView.as_view(), name='retrieve_update_delete_user'),
 ]

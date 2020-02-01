@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenViewBase
 from rbac_auth.core.auth.serializers import (
@@ -7,8 +10,9 @@ from rbac_auth.core.auth.serializers import (
     TokenObtainSlidingSerializer
 )
 from rbac_auth.core.permissions import DjangoModelPermissions
+from rbac_auth.contrib.rest_framework.mixins import DestroyModelMixin
 
-from .serializers import UserListCreateSerializer
+from .serializers import UserListCreateSerializer, UserSerializer
 
 
 User = get_user_model()
@@ -24,3 +28,8 @@ class UserListCreateAPIView(ListCreateAPIView):
     serializer_class = UserListCreateSerializer
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
     queryset = User.objects.all()
+
+class UserRetrieveUpdateDestroyView(DestroyModelMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    soft_delete_field = 'is_active'
