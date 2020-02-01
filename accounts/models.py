@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from rbac_auth.core.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from rbac_auth.core.auth.models import AbstractUser
 
 
 class User(AbstractUser):

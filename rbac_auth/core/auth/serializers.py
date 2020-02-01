@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import (
     TokenObtainSerializer as BaseTokenObtainSerializer,
     PasswordField
@@ -43,6 +44,12 @@ class TokenObtainSerializer(BaseTokenObtainSerializer):
             pass
 
         self.user = authenticate(**authenticate_kwargs)
+
+        if self.user is None:
+            raise AuthenticationFailed(
+                self.default_error_messages['no_active_account'],
+                'no_active_account'
+            )
         return {}
 
     @classmethod

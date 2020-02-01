@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.auth.backends import BaseBackend
 from django.db.models import Exists, OuterRef, Q
+from django.core.exceptions import ValidationError
+
+from utils import validate_email
 
 UserModel = get_user_model()
 
@@ -14,6 +17,7 @@ class AuthBackend(BaseBackend):
 
         try:
             if identifier == 'email':
+                validate_email(username)
                 user = UserModel.objects.get(email=username)
             elif identifier == 'username':
                 user = UserModel.objects.get(username=username)
@@ -21,6 +25,8 @@ class AuthBackend(BaseBackend):
             # Run the default password hasher once to reduce the timing
             # difference between an existing and a nonexistent user (#20760).
             UserModel().set_password(password)
+        except ValidationError:
+            return None
         else:
             if user.check_password(password) and self.user_can_authenticate(user):
                 return user
