@@ -4,7 +4,7 @@ from django.contrib.auth.backends import BaseBackend
 from django.db.models import Exists, OuterRef, Q
 from django.core.exceptions import ValidationError
 
-from utils import validate_email
+from rbac_auth.utils import validate_email
 
 UserModel = get_user_model()
 
