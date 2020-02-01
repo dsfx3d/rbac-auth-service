@@ -10,7 +10,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 User = get_user_model()
-class UserSerializer(serializers.ModelSerializer):
+class UserListSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
 
     class Meta:
