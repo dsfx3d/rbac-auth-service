@@ -8,7 +8,7 @@ from rbac_auth.core.auth.serializers import (
 )
 from rbac_auth.core.permissions import DjangoModelPermissions
 
-from .serializers import UserListSerializer
+from .serializers import UserListCreateSerializer
 
 
 User = get_user_model()
@@ -21,6 +21,6 @@ class TokenObtainSlidingView(TokenViewBase):
 
 
 class UserListCreateAPIView(ListCreateAPIView):
-    serializer_class = UserListSerializer
+    serializer_class = UserListCreateSerializer
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
     queryset = User.objects.all()
