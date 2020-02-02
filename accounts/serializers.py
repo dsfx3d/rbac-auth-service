@@ -23,7 +23,16 @@ class BaseUserSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
 
 
-class UserListCreateSerializer(BaseUserSerializer):
+class UserSummarySerializer(BaseUserSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'username',
+            'email'
+        )
+
+class UserSerializer(BaseUserSerializer):
     password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
@@ -42,14 +51,4 @@ class UserListCreateSerializer(BaseUserSerializer):
 
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data.get('password'))
-        return super(UserListCreateSerializer, self).create(validated_data)
-
-
-class UserSerializer(BaseUserSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'username',
-            'email'
-        )
+        return super(UserSerializer, self).create(validated_data)

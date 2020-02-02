@@ -17,7 +17,7 @@ from rbac_auth.contrib.rest_framework.mixins import (
 )
 
 from .serializers import (
-    UserListCreateSerializer,
+    UserSummarySerializer,
     UserSerializer,
     GroupSummarySerializer,
     GroupSerializer,
@@ -33,9 +33,10 @@ class TokenObtainSlidingView(TokenViewBase):
     serializer_class = TokenObtainSlidingSerializer
 
 
-class UserListCreateAPIView(ListCreateAPIView):
+class UserListCreateAPIView(SummarySerializerMixin, ListCreateAPIView):
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
-    serializer_class = UserListCreateSerializer
+    serializer_class = UserSerializer
+    summary_serializer_class = UserSummarySerializer
     queryset = User.objects.all()
 
 class UserRetrieveUpdateDestroyView(DestroyModelMixin, RetrieveUpdateDestroyAPIView):
