@@ -8,7 +8,9 @@ from .views import (
     TokenObtainPairView,
     TokenObtainSlidingView,
     UserListCreateAPIView,
-    UserRetrieveUpdateDestroyView
+    UserRetrieveUpdateDestroyView,
+    GroupListCreateView,
+    GroupRetrieveUpdateDestroyAPIView
 )
 
 
@@ -21,4 +23,6 @@ urlpatterns = [
 
     path('users/', UserListCreateAPIView.as_view(), name='list_create_users'),
     path('users/<str:pk>/', UserRetrieveUpdateDestroyView.as_view(), name='retrieve_update_delete_user'),
+    path('groups/', GroupListCreateView.as_view(), name='group_list_create'),
+    path('groups/<str:pk>/', GroupRetrieveUpdateDestroyAPIView.as_view(), name='group_retrieve_update_destroy'),
 ]
