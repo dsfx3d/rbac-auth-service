@@ -49,3 +49,26 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
                 {'details': f'invalid soft_delete_field: {self.soft_delete_field}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class SummarySerializerMixin:
+    summary_serializer_class = None
+    summary_query_param = 'summary'
+
+    def get_summary_serializer_class(self):
+        return self.summary_serializer_class
+
+    def get_summary_query_param(self):
+        return self.summary_query_param
+
+    def get_serializer_class(self):
+        serializer_class = super(SummarySerializerMixin, self).get_serializer_class()
+
+        summary = self.request.GET.get(self.get_summary_query_param(), False)
+
+        if summary:
+            summary_serializer = self.get_summary_serializer_class()
+            if summary_serializer is not None:
+                return summary_serializer
+
+        return serializer_class

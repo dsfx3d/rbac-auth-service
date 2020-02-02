@@ -11,12 +11,15 @@ from rbac_auth.core.auth.serializers import (
     TokenObtainSlidingSerializer
 )
 from rbac_auth.core.permissions import DjangoModelPermissions
-from rbac_auth.contrib.rest_framework.mixins import DestroyModelMixin
+from rbac_auth.contrib.rest_framework.mixins import (
+    DestroyModelMixin,
+    SummarySerializerMixin,
+)
 
 from .serializers import (
     UserListCreateSerializer,
     UserSerializer,
-    GroupListCreateSerializer,
+    GroupSummarySerializer,
     GroupSerializer,
 )
 
@@ -41,9 +44,10 @@ class UserRetrieveUpdateDestroyView(DestroyModelMixin, RetrieveUpdateDestroyAPIV
     queryset = User.objects.all()
     soft_delete_field = 'is_active'
 
-class GroupListCreateView(ListCreateAPIView):
+class GroupListCreateView(SummarySerializerMixin, ListCreateAPIView):
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
-    serializer_class = GroupListCreateSerializer
+    serializer_class = GroupSerializer
+    summary_serializer_class = GroupSummarySerializer
     queryset = Group.objects.all()
 
 class GroupRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):

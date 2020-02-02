@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 
-class GroupListCreateSerializer(serializers.ModelSerializer):
+class GroupSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         exclude = ('permissions',)
