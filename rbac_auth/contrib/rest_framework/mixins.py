@@ -9,6 +9,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
     Destroy a model instance with soft delete support.
     """
     soft_delete_field = None
+    soft_delete_query_param = 'soft'
 
     def get_soft_delete_field(self):
         if self.soft_delete_field is None:
@@ -21,14 +22,16 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
                 raise ValueError(
                     '[error][DestroyModelMixin] soft_delete_field must be in this template (field, value)'
                 )
-
         return self.soft_delete_field
+
+    def get_soft_delete_query_param(self):
+        return self.soft_delete_query_param
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        soft_delete = request.GET.get('soft', False) == '1'
+        soft_delete = request.GET.get(self.get_soft_delete_query_param(), False)
 
-        if not soft_delete:
+        if soft_delete is False:
             return super(DestroyModelMixin, self).destroy(request, *args, **kwargs)
 
         try:

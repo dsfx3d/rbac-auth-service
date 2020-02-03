@@ -1,8 +1,17 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        exclude = ('content_type',)
+        depth = 1
+
+class PermissionsPayloadSerializer(serializers.Serializer):
+    permissions = serializers.ListField(child=serializers.IntegerField())
 
 class GroupSummarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,6 +22,11 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = '__all__'
+
+class GroupPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('permissions',)
 
 
 User = get_user_model()
