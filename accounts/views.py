@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
-    DestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenViewBase
@@ -99,15 +98,22 @@ class GroupPermissionListAPIView(ListCreateAPIView):
         else:
             return Response(perms_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk):
+        group = self.get_object()
+        perms_serializer = PermissionsPayloadSerializer(data=self.request.data)
 
-class GroupPermissionDestroyAPIView(DestroyAPIView):
-    permission_classes = (IsAuthenticated, DjangoModelPermissions)
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+        if perms_serializer.is_valid():
+            group = self.get_object()
+            permissions = Permission.objects.filter(
+                id__in=perms_serializer.data.get('permissions')
+            )
 
-    def delete(self):
-        group = self.get_object(pk=self.kwargs.get('pk'))
-        perm_id = self.kwargs.get('perm')
-        group_perm = group.permissions.get(id=perm_id)
-        group.permissions.remove(group_perm)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            for perm in permissions:
+                group.permissions.remove(perm)
+                group.save()
+
+            group_perms = PermissionSerializer(permissions, many=True)
+            return Response(group_perms.data, status=status.HTTP_200_OK)
+
+        else:
+            return Response(perms_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
