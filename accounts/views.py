@@ -1,8 +1,5 @@
-from django.http import Http404
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
@@ -23,10 +20,10 @@ from .serializers import (
     UserSerializer,
     GroupSummarySerializer,
     GroupSerializer,
-    GroupPermissionSerializer,
-    PermissionSerializer,
-    PermissionsPayloadSerializer
+    PermissionSerializer
 )
+
+from .mixins import RelatedEntityAPIView
 
 
 User = get_user_model()
@@ -49,6 +46,13 @@ class UserRetrieveUpdateDestroyView(DestroyModelMixin, RetrieveUpdateDestroyAPIV
     queryset = User.objects.all()
     soft_delete_field = 'is_active'
 
+class UserGroupAPIView(RelatedEntityAPIView):
+    permission_classes = (IsAuthenticated, DjangoModelPermissions)
+    queryset = User.objects.all()
+    serializer_class = GroupSerializer
+    related_model_class = Group
+    related_field = 'groups'
+
 class GroupListCreateView(SummarySerializerMixin, ListCreateAPIView):
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
     serializer_class = GroupSerializer
@@ -60,60 +64,9 @@ class GroupRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
 
-class GroupPermissionListAPIView(ListCreateAPIView):
+class GroupPermissionAPIView(RelatedEntityAPIView):
     permission_classes = (IsAuthenticated, DjangoModelPermissions)
     queryset = Group.objects.all()
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.method == 'GET':
-            try:
-                return queryset.get(pk=self.kwargs.get('pk')).permissions
-            except Group.DoesNotExist:
-                raise Http404
-        return queryset
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return PermissionSerializer
-        else:
-            return GroupPermissionSerializer
-
-    def post(self, request, pk):
-        perms_serializer = PermissionsPayloadSerializer(data=request.data)
-
-        if perms_serializer.is_valid():
-            group = self.get_object()
-            permissions = Permission.objects.filter(
-                id__in=perms_serializer.data.get('permissions')
-            )
-
-            for perm in permissions:
-                group.permissions.add(perm)
-                group.save()
-
-            group_perms = PermissionSerializer(permissions, many=True)
-            return Response(group_perms.data, status=status.HTTP_200_OK)
-
-        else:
-            return Response(perms_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        group = self.get_object()
-        perms_serializer = PermissionsPayloadSerializer(data=self.request.data)
-
-        if perms_serializer.is_valid():
-            group = self.get_object()
-            permissions = Permission.objects.filter(
-                id__in=perms_serializer.data.get('permissions')
-            )
-
-            for perm in permissions:
-                group.permissions.remove(perm)
-                group.save()
-
-            group_perms = PermissionSerializer(permissions, many=True)
-            return Response(group_perms.data, status=status.HTTP_200_OK)
-
-        else:
-            return Response(perms_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer_class = PermissionSerializer
+    related_model_class = Permission
+    related_field = 'permissions'

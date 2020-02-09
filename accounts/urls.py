@@ -11,7 +11,8 @@ from .views import (
     UserRetrieveUpdateDestroyView,
     GroupListCreateView,
     GroupRetrieveUpdateDestroyAPIView,
-    GroupPermissionListAPIView
+    GroupPermissionAPIView,
+    UserGroupAPIView
 )
 
 
@@ -24,7 +25,8 @@ urlpatterns = [
 
     path('users/', UserListCreateAPIView.as_view(), name='list_create_users'),
     path('users/<str:pk>/', UserRetrieveUpdateDestroyView.as_view(), name='retrieve_update_delete_user'),
+    path('users/<str:pk>/groups/', UserGroupAPIView.as_view(), name='user_group_list_add_remove'),
     path('groups/', GroupListCreateView.as_view(), name='group_list_create'),
     path('groups/<str:pk>/', GroupRetrieveUpdateDestroyAPIView.as_view(), name='group_retrieve_update_destroy'),
-    path('groups/<str:pk>/permissions/', GroupPermissionListAPIView.as_view(), name='group_permissions_list')
+    path('groups/<str:pk>/permissions/', GroupPermissionAPIView.as_view(), name='group_permissions_list_add_remove')
 ]
