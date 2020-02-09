@@ -16,7 +16,7 @@ class DestroyModelMixin(mixins.DestroyModelMixin):
             raise ValueError('[error][DestroyModelMixin] soft_delete_field is not set')
 
         if is_sequence(self.soft_delete_field):
-            if len(self.soft_delete_field) > 1:
+            if len(self.soft_delete_field) == 2:
                 return self.soft_delete_field
             else:
                 raise ValueError(
